@@ -1,0 +1,31 @@
+name:  Actions CI
+
+on:
+  workflow_dispatch: 
+  
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+    - name: Display dotnet version
+      run: dotnet --version
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: publish
+      run: dotnet publish -c Release -o ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/bpcalculator
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: .net-app
+          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/bpcalculator
