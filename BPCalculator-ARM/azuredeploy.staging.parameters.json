@@ -2,5 +2,20 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "bp_webapp_plan_name": {
+      "value": "String"
+    },
+    "bp_webapp_plan_tier": {
+      "value": "String"
+    },
+    "bp_webapp_plan_size": {
+      "value": "String"
+    },
+    "bp_webapp_plan_family": {
+      "value": "String"
+    },
+    "bp_webapp_plan_capacity": {
+      "value": "String"
+    }
   }
 }
