@@ -36,14 +36,15 @@ jobs:
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" \
             /d:sonar.coverage.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml"
 
-    - name: Test with coverage
-      run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
-
-   - name: Restore dependencies
+    - name: Restore dependencies
       run: dotnet restore
       
     - name: Build
       run: dotnet build --no-restore
+
+    - name: Test with coverage
+      run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
+
  
       # ---- SONAR END ----
     - name: SonarCloud - End analysis
