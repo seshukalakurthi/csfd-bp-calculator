@@ -276,8 +276,7 @@ namespace BPCalculator.Tests
         }
 
         #endregion
-
-       
+           
         #region Boundary Tests
 
         [TestMethod]
