@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator", "BPCalculator\BPCalculator.csproj", "{5966DA6C-819D-4303-ADC7-425B8541EC84}"
 EndProject
 Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "BPCalculator-ARM", "BPCalculator-ARM\BPCalculator-ARM.deployproj", "{6F89A7CD-7DE3-4FFB-AEB0-23383C08CA33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator-TestProject", "BPCalculator-TestProject\BPCalculator-TestProject.csproj", "{60E8DAE3-E105-48BB-85F3-0CF8CE9CDADF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator-UnitTest", "BPCalculator-TestProject\BPCalculator-UnitTest.csproj", "{60E8DAE3-E105-48BB-85F3-0CF8CE9CDADF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
