@@ -18,12 +18,6 @@ jobs:
     - name: Display dotnet version
       run: dotnet --version
       
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --no-restore
-
     - name: Install SonarScanner for .NET
       run: |
           dotnet tool install --global dotnet-sonarscanner
@@ -44,6 +38,12 @@ jobs:
 
     - name: Test with coverage
       run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
+
+   - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
  
       # ---- SONAR END ----
     - name: SonarCloud - End analysis
