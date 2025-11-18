@@ -32,8 +32,27 @@ namespace BPCalculator
             get
             {
                 // implement as part of project
-                //throw new NotImplementedException("not implemented yet");
-                return new BPCategory();                       // replace this
+                
+                // High Blood Pressure: Systolic >= 140 OR Diastolic >= 90
+                if (Systolic >= 140 || Diastolic >= 90)
+                {
+                    return BPCategory.High;
+                }
+
+                // Pre-High Blood Pressure: Systolic 120-139 OR Diastolic 80-89
+                if ((Systolic >= 120 && Systolic <= 139) || (Diastolic >= 80 && Diastolic <= 89))
+                {
+                    return BPCategory.PreHigh;
+                }
+
+                // Ideal Blood Pressure: Systolic 90-119 AND Diastolic 60-79
+                if (Systolic >= 90 && Systolic <= 119 && Diastolic >= 60 && Diastolic <= 79)
+                {
+                    return BPCategory.Ideal;
+                }
+
+                // Low Blood Pressure: Systolic < 90 OR Diastolic < 60
+                return BPCategory.Low;
             }
         }
     }
