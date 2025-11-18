@@ -24,7 +24,7 @@ jobs:
     - name: publish
       run: |
         mkdir -p ./artifacts/bpcalculator
-        dotnet publish ./src/BPCalculator/BPCalculator.csproj -c Release -o ./artifacts/bpcalculator
+        dotnet publish -c Release -o ./artifacts/bpcalculator
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
