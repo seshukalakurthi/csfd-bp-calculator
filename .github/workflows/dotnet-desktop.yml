@@ -1,0 +1,64 @@
+name:  Build
+
+on:
+  workflow_dispatch: 
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+        
+    - name: Display dotnet version
+      run: dotnet --version
+      
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+
+    - name: Install SonarScanner for .NET
+      run: |
+          dotnet tool install --global dotnet-sonarscanner
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+ 
+      # ---- SONAR BEGIN ----
+    - name: SonarCloud - Begin analysis
+      env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+          dotnet sonarscanner begin \
+            /k:"tud-msc-devops_devops-csfd-ca1-bp-calculator" \
+            /o:"tud-msc-devops" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.login="$SONAR_TOKEN" \
+            /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" \
+            /d:sonar.coverage.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml"
+
+    - name: Test with coverage
+      run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
+ 
+      # ---- SONAR END ----
+    - name: SonarCloud - End analysis
+      env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: dotnet sonarscanner end /d:sonar.login="$SONAR_TOKEN"
+      # ---- SONAR END ----
+      
+    - name: publish
+      run: |
+        mkdir -p ./artifacts/bpcalculator
+        dotnet publish -c Release -o ./artifacts/bpcalculator
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: .net-app
+          path: ./artifacts/bpcalculator
