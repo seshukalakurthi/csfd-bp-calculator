@@ -1,16 +1,23 @@
-name: OWASP Dependency-Check
- 
+name: OWASP Dependency-Check (publish report)
+
+# manual trigger kept
 on: workflow_dispatch
- 
+
+# grant Pages write permission so the deploy action can publish
+permissions:
+  contents: read
+  pages: write
+
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
- 
+    outputs:
+      pages-artifact-path: ${{ steps.prepare.outputs.site_path }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
- 
-      # Optional but nice: cache the Dependency-Check data dir so NVD doesn't download every run
+
       - name: Cache Dependency-Check data
         uses: actions/cache@v4
         with:
@@ -18,7 +25,7 @@ jobs:
           key: ${{ runner.os }}-dependency-check
           restore-keys: |
             ${{ runner.os }}-dependency-check
- 
+
       - name: Run OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
@@ -26,10 +33,34 @@ jobs:
           path: "."
           format: "HTML"
           out: "dependency-check-report"
- 
-      # Upload the HTML report as an artifact so you can download it
-      - name: Upload Dependency-Check report
-        uses: actions/upload-artifact@v4
+
+      # Prepare a directory that will become the Pages site root
+      - name: Prepare pages folder
+        id: prepare
+        run: |
+          mkdir -p site
+          # copy the generated report and give it a friendly name/index
+          # if your report path differs, adjust below
+          cp -v dependency-check-report/dependency-check-report.html site/index.html
+          echo "site_path=site" >> "$GITHUB_OUTPUT"
+
+      # Upload the folder as a Pages artifact (used by the deploy job)
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: dependency-check-report
-          path: dependency-check-report
+          path: site
+
+  deploy-pages:
+    needs: dependency-check
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      # This action consumes the special artifact uploaded above and deploys it to Pages
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Print published site URL
+        run: |
+          echo "Pages site published at: ${{ steps.deploy.outputs.page_url }}"
