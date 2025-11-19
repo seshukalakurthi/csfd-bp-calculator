@@ -54,10 +54,11 @@ jobs:
       # ---- SONAR END ----
       
     - name: publish
-      run: dotnet publish -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/bp
-
+      run: |
+         mkdir -p ./artifacts/bpcalculator
+          dotnet publish -c Release -o ./artifacts/bpcalculator
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
           name: .net-app
-          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/bp
+          path: ./artifacts/bpcalculator
