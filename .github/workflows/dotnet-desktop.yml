@@ -40,7 +40,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --configuration Release
 
     - name: Test with coverage
       run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
@@ -54,12 +54,10 @@ jobs:
       # ---- SONAR END ----
       
     - name: publish
-      run: |
-        mkdir -p ./artifacts/bpcalculator
-        dotnet publish ./src/BPCalculator/BPCalculator.csproj -c Release -o ./artifacts/bpcalculator
+      run: dotnet publish -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/bp
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
           name: .net-app
-          path: ./artifacts/bpcalculator
+          path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}/bp
