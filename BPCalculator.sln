@@ -5,7 +5,7 @@ VisualStudioVersion = 18.0.11205.157 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator", "BPCalculator\BPCalculator.csproj", "{5966DA6C-819D-4303-ADC7-425B8541EC84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator-UnitTest", "BPCalculator-TestProject\BPCalculator-UnitTest.csproj", "{60E8DAE3-E105-48BB-85F3-0CF8CE9CDADF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator-UnitTest", "BPCalculator-UnitTest\BPCalculator-UnitTest.csproj", "{60E8DAE3-E105-48BB-85F3-0CF8CE9CDADF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator-BDDTest", "BPCalculator-BDDTest\BPCalculator-BDDTest.csproj", "{9652AA50-1038-4C23-9113-3E4A7828C470}"
 EndProject
