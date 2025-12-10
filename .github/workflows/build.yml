@@ -3,9 +3,6 @@ name: CI Build
 on:
   workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_PACKAGE_PATH: publish/bp
-
 jobs:
   build:
     runs-on: ubuntu-latest
