@@ -1,16 +1,16 @@
-name:  Deploy
+name: CD Deploy
 
 on:
   workflow_run:
-    workflows: ["Basic Build"]   # name of the CI workflow above
+    workflows: ["CI Build"]
     types:
       - completed
-  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: bp
