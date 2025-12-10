@@ -1,5 +1,7 @@
 name:  Basic Build
 
+env:
+  AZURE_WEBAPP_PACKAGE_PATH: 'publish/bp' 
 on:
   workflow_dispatch: 
   
@@ -22,11 +24,11 @@ jobs:
       run: dotnet build --configuration Release --no-restore
       
     - name: publish
-      run: dotnet publish -c Release -o ./publish
+      run: dotnet publish -c Release --property:PublishDir=${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
           name: bp
-          path: ./publish
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
           retention-days: 30
