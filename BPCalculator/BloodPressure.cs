@@ -83,7 +83,6 @@ namespace BPCalculator
                 : 0;
 
         public BMICategory BMICategory =>
-            BMI == 0 ? BMICategory.Normal : // default if not provided
             BMI < 18.5 ? BMICategory.Underweight :
             BMI < 25 ? BMICategory.Normal :
             BMI < 30 ? BMICategory.Overweight : BMICategory.Obese;
