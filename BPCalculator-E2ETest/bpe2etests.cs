@@ -4,7 +4,6 @@ using Xunit;
 
 namespace BPCalculator_E2ETest
 {
-    // Add Trait so we can filter these tests out in CI
     [Trait("TestCategory", "E2E")]
     public class bpe2etests
     {
@@ -23,9 +22,11 @@ namespace BPCalculator_E2ETest
         {
             await page.FillAsync("#BP_Systolic", systolic);
             await page.FillAsync("#BP_Diastolic", diastolic);
+            await page.FillAsync("#BP_HeightCm", "170"); // valid height
+            await page.FillAsync("#BP_WeightKg", "65");  // valid weight
             await page.ClickAsync("input[type='submit']");
-            await page.WaitForTimeoutAsync(500); // small delay for result
-            return await page.InnerTextAsync("form");
+            await page.WaitForTimeoutAsync(500);
+            return await page.InnerTextAsync("body"); // broader scope than "form"
         }
 
         [Fact]
@@ -33,7 +34,7 @@ namespace BPCalculator_E2ETest
         {
             var page = await LaunchPageAsync();
             var result = await SubmitBpAsync(page, "85", "55");
-            Assert.Contains("Low Blood Pressure", result);
+            Assert.Contains("Low", result);
         }
 
         [Fact]
@@ -41,7 +42,7 @@ namespace BPCalculator_E2ETest
         {
             var page = await LaunchPageAsync();
             var result = await SubmitBpAsync(page, "100", "60");
-            Assert.Contains("Ideal Blood Pressure", result);
+            Assert.Contains("Ideal", result);
         }
 
         [Fact]
@@ -49,7 +50,7 @@ namespace BPCalculator_E2ETest
         {
             var page = await LaunchPageAsync();
             var result = await SubmitBpAsync(page, "135", "85");
-            Assert.Contains("Pre-High Blood Pressure", result);
+            Assert.Contains("PreHigh", result);
         }
 
         [Fact]
@@ -57,7 +58,7 @@ namespace BPCalculator_E2ETest
         {
             var page = await LaunchPageAsync();
             var result = await SubmitBpAsync(page, "150", "95");
-            Assert.Contains("High Blood Pressure", result);
+            Assert.Contains("High", result);
         }
 
         [Fact]

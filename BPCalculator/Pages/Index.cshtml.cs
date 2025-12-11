@@ -13,7 +13,7 @@ namespace BPCalculator.Pages
         // setup initial data
         public void OnGet()
         {
-            BP = new BloodPressure() { Systolic = 100, Diastolic = 60 };
+            BP = new BloodPressure() { Systolic = 100, Diastolic = 60, HeightCm = 170, WeightKg = 65 };
         }
 
         // POST, validate

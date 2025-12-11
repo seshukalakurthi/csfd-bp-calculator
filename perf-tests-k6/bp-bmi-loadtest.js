@@ -39,6 +39,8 @@ export default function () {
         "__RequestVerificationToken": token,
         "BP.Systolic": 130,
         "BP.Diastolic": 85,
+        "BP.HeightCm": 175,
+        "BP.WeightKg": 70,
     };
 
     const resPost = http.post(
