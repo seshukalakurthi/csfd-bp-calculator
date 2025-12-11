@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "perf-tests-k6", "perf-tests
 		load-test.js = load-test.js
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BPCalculator-E2ETest", "BPCalculator-E2ETest\BPCalculator-E2ETest.csproj", "{B140A6D7-78A4-4BA5-AD7D-B4167572807C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{9652AA50-1038-4C23-9113-3E4A7828C470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9652AA50-1038-4C23-9113-3E4A7828C470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9652AA50-1038-4C23-9113-3E4A7828C470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B140A6D7-78A4-4BA5-AD7D-B4167572807C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B140A6D7-78A4-4BA5-AD7D-B4167572807C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B140A6D7-78A4-4BA5-AD7D-B4167572807C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B140A6D7-78A4-4BA5-AD7D-B4167572807C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
