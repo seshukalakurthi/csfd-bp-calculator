@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace BPUnitTests
+namespace BPCalculator_UnitTest
 {
     [TestClass]
     public class BloodPressureTests
