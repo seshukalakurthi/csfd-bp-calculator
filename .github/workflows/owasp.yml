@@ -1,9 +1,7 @@
 name: OWASP Dependency-Check
 
-# manual trigger kept
-on: workflow_dispatch
-
-# grant Pages write permission so the deploy action can publish
+on:
+  workflow_dispatch:   # manual trigger
 permissions:
   contents: read
   pages: write
@@ -32,20 +30,20 @@ jobs:
         with:
           project: "BPCalculator"
           path: "."
-          format: "HTML"
+          format: "HTML,JSON,XML"   # generate multiple formats
           out: "dependency-check-report"
 
-      # Prepare a directory that will become the Pages site root
       - name: Prepare pages folder
         id: prepare
         run: |
           mkdir -p site
-          # copy the generated report and give it a friendly name/index
-          # if your report path differs, adjust below
+          # copy HTML report as index.html for Pages
           cp -v dependency-check-report/dependency-check-report.html site/index.html
+          # include JSON and XML for deeper analysis
+          cp -v dependency-check-report/dependency-check-report.json site/dependency-check-report.json || true
+          cp -v dependency-check-report/dependency-check-report.xml site/dependency-check-report.xml || true
           echo "site_path=site" >> "$GITHUB_OUTPUT"
 
-      # Upload the folder as a Pages artifact (used by the deploy job)
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -56,12 +54,11 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      # This action consumes the special artifact uploaded above and deploys it to Pages
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v4
 
       - name: Print published site URL
-        run: |
-          echo "Pages site published at: ${{ steps.deploy.outputs.page_url }}"
+        run: echo "Pages site published at: ${{ steps.deploy.outputs.page_url }}"
