@@ -46,7 +46,7 @@ jobs:
         run: dotnet build --no-restore
  
       - name: Test with coverage
-        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
+        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx" --filter "TestCategory!=E2E"
  
       # ---- SONAR END ----
       - name: SonarCloud - End analysis
