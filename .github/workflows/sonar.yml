@@ -34,8 +34,8 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.login="$SONAR_TOKEN" \
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" \
-            /d:sonar.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/load-test.js" \
-            /d:sonar.coverage.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/load-test.js"
+            /d:sonar.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/load-test.js,**/BPCalculator-E2ETest" \
+            /d:sonar.coverage.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/load-test.js,**/BPCalculator-E2ETest"
       # ---- SONAR BEGIN ----
  
       - name: Restore dependencies
@@ -45,7 +45,7 @@ jobs:
         run: dotnet build --no-restore
  
       - name: Test with coverage
-        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx"
+        run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx" --filter "TestCategory!=E2E"
  
       # ---- SONAR END ----
       - name: SonarCloud - End analysis
