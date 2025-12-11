@@ -4,6 +4,8 @@ using Xunit;
 
 namespace BPCalculator_E2ETest
 {
+    // Add Trait so we can filter these tests out in CI
+    [Trait("TestCategory", "E2E")]
     public class bpe2etests
     {
         private const string BaseUrl = "http://localhost:53135"; // adjust if needed
