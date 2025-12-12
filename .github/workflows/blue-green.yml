@@ -1,0 +1,126 @@
+name: Blue/Green Pipeline
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ---------------- CI ----------------
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build & Package
+        run: |
+          dotnet publish src/WebApp -c Release -o publish
+          zip -r webapp.zip publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webapp-artifact
+          path: webapp.zip
+
+  # ---------------- QA ----------------
+  qa:
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: .
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to QA staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          slot-name: staging
+          package: webapp.zip
+
+      - name: Swap staging to production
+        run: az webapp deployment slot swap \
+              --name "${{ vars.WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.RESOURCE_GROUP }}" \
+              --slot staging
+
+  # ---------------- Staging ----------------
+  staging:
+    needs: 
+    - ci
+    - qa
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: .
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Staging staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          slot-name: staging
+          package: webapp.zip
+
+      - name: Swap staging to production
+        run: az webapp deployment slot swap \
+              --name "${{ vars.WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.RESOURCE_GROUP }}" \
+              --slot staging
+
+  # ---------------- Prod ----------------
+  prod:
+    needs: 
+    - ci
+    - qa
+    - staging
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: .
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Prod staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          slot-name: staging
+          package: webapp.zip
+
+      - name: Swap staging to production
+        run: az webapp deployment slot swap \
+              --name "${{ vars.WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.RESOURCE_GROUP }}" \
+              --slot staging
