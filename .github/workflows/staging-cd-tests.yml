@@ -1,0 +1,89 @@
+name: Staging CD with k6 & zap Test
+
+on:
+  workflow_run:
+    workflows: ["CI with tests"]
+    types:
+      - completed
+
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bpapp
+          path: ./publish
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Azure Login (client secret)
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Staging staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          slot-name: staging
+          package: ./publish
+
+      - name: Swap staging to production
+        run: |
+          az webapp deployment slot swap \
+              --name "${{ vars.WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.RESOURCE_GROUP }}" \
+              --slot "${{ vars.SLOT_NAME }}" \
+              --target-slot production
+      
+      # Install k6
+      - name: Install k6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg ca-certificates
+          curl https://dl.k6.io/key.gpg | sudo gpg --yes --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      # Run k6
+      - name: Run k6 Performance Tests
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+        run: |
+          k6 run perf-tests-k6/bp-bmi-loadtest.js | tee k6report.txt
+
+      - name: Upload k6 Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-performance-report
+          path: k6report.txt
+
+      # Prepare ZAP report dir
+      - name: Prepare ZAP report directory
+        run: |
+          mkdir -p zap-report
+          chmod 777 zap-report
+
+      # ZAP baseline against staging
+      - name: OWASP ZAP Baseline Scan
+        continue-on-error: true
+        env:
+          TARGET_URL: ${{ vars.BASE_URL  }}
+        run: |
+          docker run \
+            -v "$PWD/zap-report:/zap/wrk/:rw" \
+            -t ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "$TARGET_URL" -r zap-report.html -a || true
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap-report
+ 

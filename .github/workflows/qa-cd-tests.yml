@@ -1,0 +1,65 @@
+name: QA CD with E2E Test
+
+on:
+  workflow_run:
+    workflows: ["CI with tests"]
+    types:
+      - completed
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bpapp
+          path: ./publish
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Azure Login (client secret)
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to QA staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          slot-name: staging
+          package: ./publish
+
+      - name: Swap staging to production
+        run: |
+          az webapp deployment slot swap \
+              --name "${{ vars.WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.RESOURCE_GROUP }}" \
+              --slot "${{ vars.SLOT_NAME }}" \
+              --target-slot production
+
+       # Cache Playwright browsers
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-cache
+          restore-keys: |
+            ${{ runner.os }}-playwright-cache
+
+      # Install Playwright browsers
+      - name: Install Playwright browsers
+        working-directory: BPCalculator-E2ETest
+        run: |
+          dotnet build -c Release
+          pwsh ./bin/Release/net9.0/playwright.ps1 install --with-deps
+
+      # Run E2E tests against staging URL
+      - name: Run Playwright E2E tests
+        working-directory: BPCalculator-E2ETest
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+        run: dotnet test -c Release --no-build --filter "TestCategory=E2E"
