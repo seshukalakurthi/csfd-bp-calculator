@@ -1,0 +1,42 @@
+name: Prod CD
+
+on:
+  workflow_run:
+    workflows: ["CI with tests"]
+    types:
+      - completed
+
+jobs:
+  prod:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bpapp
+          path: ./publish
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Azure Login (client secret)
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Prod staging slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.WEBAPP_NAME }}
+          slot-name: staging
+          package: ./publish
+
+      - name: Swap staging to production
+        run: |
+          az webapp deployment slot swap \
+              --name "${{ vars.WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.RESOURCE_GROUP }}" \
+              --slot "${{ vars.SLOT_NAME }}" \
+              --target-slot production
