@@ -2,7 +2,7 @@ name: CD with Tests
 
 on:
   workflow_run:
-    workflows: ["Build with CI tests"]
+    workflows: ["CI with tests"]
     types:
       - completed
 
