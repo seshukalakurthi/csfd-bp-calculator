@@ -60,7 +60,8 @@ jobs:
           package: ./publish
 
       - name: Swap staging to production
-        run: az webapp deployment slot swap \
+        run: |
+          az webapp deployment slot swap \
               --name "${{ vars.WEBAPP_NAME }}" \
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
               --slot "${{ vars.SLOT_NAME }}" \
@@ -94,7 +95,8 @@ jobs:
           package: ./publish
 
       - name: Swap staging to production
-        run: az webapp deployment slot swap \
+        run: |
+          az webapp deployment slot swap \
               --name "${{ vars.WEBAPP_NAME }}" \
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
               --slot "${{ vars.SLOT_NAME }}" \
@@ -129,7 +131,8 @@ jobs:
           package: ./publish
 
       - name: Swap staging to production
-        run: az webapp deployment slot swap \
+        run: |
+          az webapp deployment slot swap \
               --name "${{ vars.WEBAPP_NAME }}" \
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
               --slot "${{ vars.SLOT_NAME }}" \
