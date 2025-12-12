@@ -42,8 +42,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: webapp-artifact
-          path: .
+          name: bpapp
+          path: ./publish
 
       - name: Azure login
         uses: azure/login@v2
@@ -57,7 +57,7 @@ jobs:
         with:
           app-name: ${{ vars.WEBAPP_NAME }}
           slot-name: staging
-          package: webapp.zip
+          package: ./publish
 
       - name: Swap staging to production
         run: az webapp deployment slot swap \
@@ -75,8 +75,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: webapp-artifact
-          path: .
+          name: bpapp
+          path: ./publish
 
       - name: Azure login
         uses: azure/login@v2
@@ -90,7 +90,7 @@ jobs:
         with:
           app-name: ${{ vars.WEBAPP_NAME }}
           slot-name: staging
-          package: webapp.zip
+          package: ./publish
 
       - name: Swap staging to production
         run: az webapp deployment slot swap \
@@ -109,9 +109,9 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: webapp-artifact
-          path: .
-
+          name: bpapp
+          path: ./publish
+        
       - name: Azure login
         uses: azure/login@v2
         with:
@@ -124,7 +124,7 @@ jobs:
         with:
           app-name: ${{ vars.WEBAPP_NAME }}
           slot-name: staging
-          package: webapp.zip
+          package: ./publish
 
       - name: Swap staging to production
         run: az webapp deployment slot swap \
