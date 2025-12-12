@@ -62,7 +62,7 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.login="$SONAR_TOKEN" \
             /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/coverage.opencover.xml" \
-            /d:sonar.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/bp-bmi-loadtest.js,**/BPCalculator-E2ETest/**" \
+            /d:sonar.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/bp-bmi-loadtest.js,**/BPCalculator-E2ETest/**,dependency-check-report/**" \
             /d:sonar.test.exclusions="**/BPCalculator-E2ETest/**" \
             /d:sonar.coverage.exclusions="**/Program.cs,**/Startup.cs,**/Pages/*.cs,**/Pages/*.cshtml,**/bp-bmi-loadtest.js,**/BPCalculator-E2ETest/**"
 
