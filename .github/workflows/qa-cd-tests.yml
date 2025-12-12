@@ -1,4 +1,4 @@
-name: CD with Tests
+name: QA CD with E2E Test
 
 on:
   workflow_run:
@@ -40,3 +40,26 @@ jobs:
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
               --slot "${{ vars.SLOT_NAME }}" \
               --target-slot production
+
+       # Cache Playwright browsers
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-cache
+          restore-keys: |
+            ${{ runner.os }}-playwright-cache
+
+      # Install Playwright browsers
+      - name: Install Playwright browsers
+        working-directory: BPCalculator-E2ETest
+        run: |
+          dotnet build -c Release
+          pwsh ./bin/Release/net9.0/playwright.ps1 install --with-deps
+
+      # Run E2E tests against staging URL
+      - name: Run Playwright E2E tests against Staging
+        working-directory: BPCalculator-E2ETest
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+        run: dotnet test -c Release --no-build --filter "Category=E2E"
