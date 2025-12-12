@@ -45,13 +45,10 @@ jobs:
           name: bpapp
           path: ./publish
 
-      - name: Azure login
+      - name: Azure Login (client secret)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to QA staging slot
         uses: azure/webapps-deploy@v3
@@ -81,13 +78,10 @@ jobs:
           name: bpapp
           path: ./publish
 
-      - name: Azure login
+      - name: Azure Login (client secret)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Staging staging slot
         uses: azure/webapps-deploy@v3
@@ -118,13 +112,10 @@ jobs:
           name: bpapp
           path: ./publish
         
-      - name: Azure login
+      - name: Azure Login (client secret)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Prod staging slot
         uses: azure/webapps-deploy@v3
