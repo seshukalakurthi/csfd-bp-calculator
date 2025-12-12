@@ -52,11 +52,11 @@ jobs:
           sudo apt-get install -y k6
 
       # Run k6
-      - name: Run k6 Performance Test against Staging
+      - name: Run k6 Performance Tests
         env:
           BASE_URL: ${{ vars.BASE_URL }}
         run: |
-          k6 run k6Tests/performance.js | tee k6report.txt
+          k6 run perf-tests-k6/bp-bmi-loadtest.js | tee k6report.txt
 
       - name: Upload k6 Report
         uses: actions/upload-artifact@v4
