@@ -1,24 +1,16 @@
 name: OWASP Dependency-Check
 
-on:
-  workflow_dispatch:
-
-  
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+on: workflow_dispatch
 
 jobs:
   dependency-check:
     runs-on: ubuntu-latest
-    outputs:
-      pages-artifact-path: ${{ steps.prepare.outputs.site_path }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Optional but nice: cache the Dependency-Check data dir so NVD doesn't download every run
       - name: Cache Dependency-Check data
         uses: actions/cache@v4
         with:
@@ -32,21 +24,12 @@ jobs:
         with:
           project: "BPCalculator"
           path: "."
-          format: "HTML,JSON,XML"   # generate multiple formats
+          format: "HTML"
           out: "dependency-check-report"
 
-      - name: Prepare pages folder
-        id: prepare
-        run: |
-          mkdir -p site
-          # copy HTML report as index.html for Pages
-          cp -v dependency-check-report/dependency-check-report.html site/index.html
-          # include JSON and XML for deeper analysis
-          cp -v dependency-check-report/dependency-check-report.json site/dependency-check-report.json || true
-          cp -v dependency-check-report/dependency-check-report.xml site/dependency-check-report.xml || true
-          echo "site_path=site" >> "$GITHUB_OUTPUT"
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      # Upload the HTML report as an artifact so you can download it
+      - name: Upload Dependency-Check report
+        uses: actions/upload-artifact@v4
         with:
-          path: site
+          name: dependency-check-report
+          path: dependency-check-report
