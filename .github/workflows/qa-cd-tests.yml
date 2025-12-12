@@ -58,8 +58,8 @@ jobs:
           pwsh ./bin/Release/net9.0/playwright.ps1 install --with-deps
 
       # Run E2E tests against staging URL
-      - name: Run Playwright E2E tests against Staging
+      - name: Run Playwright E2E tests
         working-directory: BPCalculator-E2ETest
         env:
           BASE_URL: ${{ vars.BASE_URL }}
-        run: dotnet test -c Release --no-build --filter "Category=E2E"
+        run: dotnet test -c Release --no-build --filter "TestCategory=E2E"
