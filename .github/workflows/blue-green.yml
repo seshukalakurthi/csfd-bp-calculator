@@ -63,7 +63,8 @@ jobs:
         run: az webapp deployment slot swap \
               --name "${{ vars.WEBAPP_NAME }}" \
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
-              --slot staging
+              --slot "${{ vars.SLOT_NAME }}" \
+              --target-slot production
 
   # ---------------- Staging ----------------
   staging:
@@ -96,7 +97,8 @@ jobs:
         run: az webapp deployment slot swap \
               --name "${{ vars.WEBAPP_NAME }}" \
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
-              --slot staging
+              --slot "${{ vars.SLOT_NAME }}" \
+              --target-slot production
 
   # ---------------- Prod ----------------
   prod:
@@ -130,4 +132,5 @@ jobs:
         run: az webapp deployment slot swap \
               --name "${{ vars.WEBAPP_NAME }}" \
               --resource-group "${{ secrets.RESOURCE_GROUP }}" \
-              --slot staging
+              --slot "${{ vars.SLOT_NAME }}" \
+              --target-slot production
