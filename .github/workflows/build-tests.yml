@@ -1,4 +1,4 @@
-name: Build with CI tests
+name: CI with tests
 
 on:
   workflow_dispatch:
