@@ -7,7 +7,7 @@ namespace BPCalculator_E2ETest
     [Trait("TestCategory", "E2E")]
     public class bmi_e2etests
     {
-        private const string BaseUrl = "http://localhost:53135"; // adjust if needed
+        private static string BaseUrl => Environment.GetEnvironmentVariable("BASE_URL") ?? "http://localhost:53135"; // adjust if needed
 
         private async Task<IPage> LaunchPageAsync()
         {
