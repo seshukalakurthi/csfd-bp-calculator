@@ -1,0 +1,157 @@
+name: Multi Env CI/CD
+
+on:
+  workflow_dispatch:   # manual trigger to start full pipeline
+  push:
+    branches: [ main ] # optional: run automatically on main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ---------------- CI ----------------
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Unit tests
+        run: dotnet test BPCalculator_UnitTest --logger "trx;LogFileName=unit.trx"
+
+      - name: BDD tests
+        run: dotnet test BPCalculator_BDDTest --logger "trx;LogFileName=bdd.trx"
+
+      - name: SonarQube analysis
+        run: echo "Run SonarQube scanner here"
+
+      - name: OWASP Dependency Check
+        run: echo "Run OWASP dependency check here"
+
+      - name: Package artifact
+        run: |
+          dotnet publish src/WebApp -c Release -o publish
+          zip -r webapp.zip publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webapp-artifact
+          path: webapp.zip
+
+  # ---------------- QA ----------------
+  qa:
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: qa
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: .
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to QA green slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.QA_WEBAPP_NAME }}
+          slot-name: green
+          package: webapp.zip
+
+      - name: Swap green → blue
+        run: az webapp deployment slot swap \
+              --name "${{ vars.QA_WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.QA_RESOURCE_GROUP }}" \
+              --slot green
+
+  # ---------------- Staging ----------------
+  staging:
+    needs: qa
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: .
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Staging green slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.STAGING_WEBAPP_NAME }}
+          slot-name: green
+          package: webapp.zip
+
+      - name: Run E2E tests
+        run: npx playwright test
+        env:
+          BASE_URL: https://${{ vars.STAGING_WEBAPP_NAME }}-green.azurewebsites.net
+
+      - name: k6 performance test
+        run: k6 run tests/perf.js
+        env:
+          BASE_URL: https://${{ vars.STAGING_WEBAPP_NAME }}-green.azurewebsites.net
+
+      - name: ZAP security scan
+        run: docker run --rm -v $PWD:/zap/wrk ghcr.io/zaproxy/zap-baseline:latest \
+          -t https://${{ vars.STAGING_WEBAPP_NAME }}-green.azurewebsites.net -r zap-report.html
+
+      - name: Swap green → blue
+        run: az webapp deployment slot swap \
+              --name "${{ vars.STAGING_WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.STAGING_RESOURCE_GROUP }}" \
+              --slot green
+
+  # ---------------- Prod ----------------
+  prod:
+    needs: staging
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: webapp-artifact
+          path: .
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Prod green slot
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.PROD_WEBAPP_NAME }}
+          slot-name: green
+          package: webapp.zip
+
+      - name: k6 canary test
+        run: k6 run tests/canary.js
+        env:
+          BASE_URL: https://${{ vars.PROD_WEBAPP_NAME }}-green.azurewebsites.net
+
+      - name: Swap green → blue
+        run: az webapp deployment slot swap \
+              --name "${{ vars.PROD_WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.PROD_RESOURCE_GROUP }}" \
+              --slot green
