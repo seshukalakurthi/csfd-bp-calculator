@@ -72,7 +72,7 @@ jobs:
     # TEST with coverage (no E2E)
       
     - name: Test with coverage (no E2E)
-      run: dotnet test --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx" --filter "TestCategory!=E2E"
+      run: dotnet test -c Release --no-build --collect:"XPlat Code Coverage;Format=opencover" --logger "trx" --filter "TestCategory!=E2E"
 
     - name: SonarCloud - End analysis
       env:
