@@ -1,28 +1,76 @@
-name: CI Build
+name: C
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   
 
+env:
+  PROD_APP_NAME: bp-app-prod
+  PROD_URL: https://bp-app-prod.azurewebsites.net
+  STAGING_SLOT_NAME: staging
+  STAGING_URL: https://bp-app-prod-staging.azurewebsites.net   
+  RESOURCE_GROUP: bp-ca
+
+#  BUILD + Tests
 jobs:
-  build:
+  build_and_prechecks:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: '8.0.x'
+
       - name: Restore dependencies
         run: dotnet restore
-        
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-        
-      - name: Publish
-        run: dotnet publish -c Release -o ./publish
 
-      - name: Upload artifact
+      
+      # OWASP DEPENDENCY CHECK
+     
+      - name: Cache Dependency-Check data
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check
+          key: ${{ runner.os }}-dependency-check
+          restore-keys: |
+            ${{ runner.os }}-dependency-check
+
+      - name: Run OWASP Dependency-Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "bp"
+          path: "."
+          format: "HTML"
+          out: "dependency-check-report"
+
+      - name: Upload Dependency-Check report
         uses: actions/upload-artifact@v4
         with:
-          name: bp
+          name: dependency-check-report
+          path: dependency-check-report
+
+      
+      # BUILD
+      
+      - name: Build solution
+        run: dotnet build -c Release --no-restore
+
+      
+      # UNIT + BDD TESTS 
+      - name: Run Unit + BDD tests
+        run: dotnet test -c Release --no-build --filter TestCategory!=E2E
+
+     
+      # PUBLISH  + ARTIFACT
+
+      - name: Publish Application
+        run: dotnet publish BPCalculator/BPCalculator.csproj -c Release -o ./publish
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bpapp
           path: ./publish
