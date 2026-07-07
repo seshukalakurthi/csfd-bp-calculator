@@ -22,4 +22,4 @@ Automated via GitHub Actions ([workflows](.github/workflows)) - created seperate
 
 ## Stack
 
-C# / ASP.NET Core · Gherkin (BDD) · k6 · SonarCloud · GitHub Actions
+C# / ASP.NET Core · Gherkin (BDD) · k6 · SonarCloud · GitHub Actions · Azure Web Apps
