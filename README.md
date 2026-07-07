@@ -8,8 +8,7 @@ Takes systolic/diastolic input and returns the corresponding blood pressure cate
 
 ## Testing & Quality
 
-This project isn't just the app - it's built around a complete testing 
-strategy:
+This project isn't just the app - it's built around a complete testing strategy:
 
 - **Unit tests** (`BPCalculator-UnitTest`) — core calculation logic
 - **BDD tests** (`BPCalculator-BDDTest`) — Gherkin-based behavior specs
@@ -19,10 +18,7 @@ strategy:
 
 ## CI/CD
 
-Automated via GitHub Actions ([workflows](.github/workflows)) — 
-[describe what triggers on push/PR: build, test suite execution, 
-SonarCloud scan, deployment to GitHub Pages, etc. — check the workflow 
-YAML if you don't remember the exact steps]
+Automated via GitHub Actions ([workflows](.github/workflows)) — created seperate workflows for all types of testings, CI/CD and deployment strategy.
 
 ## Stack
 
