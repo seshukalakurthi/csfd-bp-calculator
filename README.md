@@ -10,15 +10,15 @@ Takes systolic/diastolic input and returns the corresponding blood pressure cate
 
 This project isn't just the app - it's built around a complete testing strategy:
 
-- **Unit tests** (`BPCalculator-UnitTest`) — core calculation logic
-- **BDD tests** (`BPCalculator-BDDTest`) — Gherkin-based behavior specs
-- **End-to-end tests** (`BPCalculator-E2ETest`) — full user-flow validation
-- **Performance tests** (`perf-tests-k6`) — load testing with k6
-- **Code quality** — SonarCloud static analysis integrated via `.sonarcloud.properties`
+- **Unit tests** (`BPCalculator-UnitTest`) - core calculation logic
+- **BDD tests** (`BPCalculator-BDDTest`) - Gherkin-based behavior specs
+- **End-to-end tests** (`BPCalculator-E2ETest`) - full user-flow validation
+- **Performance tests** (`perf-tests-k6`) - load testing with k6
+- **Code quality** — SonarCloud static analysis
 
 ## CI/CD
 
-Automated via GitHub Actions ([workflows](.github/workflows)) — created seperate workflows for all types of testings, CI/CD and deployment strategy.
+Automated via GitHub Actions ([workflows](.github/workflows)) - created seperate workflows for all types of testings, CI/CD and deployment strategy.
 
 ## Stack
 
